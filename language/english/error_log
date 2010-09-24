@@ -1,0 +1,2 @@
+[09-Dec-2005 16:20:07] PHP Warning:  Unknown(): Unable to load dynamic library './php_domxml.dll' - ./php_domxml.dll: cannot open shared object file: No such file or directory in Unknown on line 0
+[09-Dec-2005 16:20:08] PHP Warning:  Unknown(): Unable to load dynamic library './php_domxml.dll' - ./php_domxml.dll: cannot open shared object file: No such file or directory in Unknown on line 0

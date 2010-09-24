@@ -1,0 +1,3 @@
+[07-Dec-2005 01:44:27] PHP Warning:  Unknown(): Unable to load dynamic library './php_domxml.dll' - ./php_domxml.dll: cannot open shared object file: No such file or directory in Unknown on line 0
+[10-Dec-2005 18:03:09] PHP Warning:  Unknown(): Unable to load dynamic library './php_domxml.dll' - ./php_domxml.dll: cannot open shared object file: No such file or directory in Unknown on line 0
+[10-Dec-2005 18:03:09] PHP Warning:  Zend Optimizer does not support this version of PHP - please upgrade to the latest version of Zend Optimizer in Unknown on line 0
