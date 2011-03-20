@@ -49,7 +49,7 @@ $dbh=mysql_connect ($config['db']['server'], $config['db']['user'], $config['db'
 mysql_select_db ($config['db']['db']);
 
 $yay = 0; $user = ''; $pass = ''; $sess = '';
-$theme='';
+$theme=''; $logged=false;
 
 if ( isset($_REQUEST['login']) ) $user = $_REQUEST['login'];
 elseif ( isset($_COOKIE['user']) ) $user = $_COOKIE['user'];
@@ -97,11 +97,14 @@ if ($yay) {
 	setcookie('pass',$pass,time()+60*60*24*1);
 	setcookie('sess',$sess,time()+60*60*24*1);
 
+        $logged=true;
+
 } else {    
 	$er=false;
         if ( isset($_REQUEST['login']) || isset($_REQUEST['encpas']) ) $er = true;
 	$theme=$defaulttheme;
         require_once("themes/$theme/theme.php");
+        $logged=false;
 	login($er);
 }
 
@@ -123,7 +126,6 @@ function login($fail = false) {
 	setcookie('sess','',time()-60*60*24*1);
 	$user = '';
 	$pass = '';
-
   global $configindex, $extraheaders, $REQUEST_URI, $sqlpref, $lastpage, $bgcolor1, $bgcolor2,$bgcolor3, $tbcolor1, $tbcolor2, $fail, $login, $password, $user, $pass;
     $randsess = md5(md5(rand(1,25419876)).md5(date("DMjygia")));
     $extraheaders = "<script language=javascript>\n"
@@ -358,6 +360,7 @@ function listdir($dir, $level_count = 0) {
 
 
 function logout() {
+  global $logged;
   setcookie("user","",time()-60*60*24*1);
   setcookie("pass","",time()-60*60*24*1);
   $login=null;
@@ -365,6 +368,7 @@ function logout() {
   echo "Your are now logged out."
       ."<br><br>"
       ."<a href=?p=login>Click here to Log in again</a>";
+  $logged=false;
   page_footer();
 }
 
