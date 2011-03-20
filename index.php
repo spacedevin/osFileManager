@@ -1,5 +1,4 @@
 <?php
-
 /****************************************************************/
 /*                                                              */
 /* File Admin                                                   */
@@ -32,7 +31,7 @@
 /* $defaultlang - default language.                             */
 /****************************************************************/
 
-$adminfile = $SCRIPT_NAME;
+$adminfile = $_SERVER['PHP_SELF'];
 $sitetitle = "Demo Browser";
 $config['db']['server'] 		= 'localhost';
 $config['db']['user'] 			= 'arzbeta_libra';
@@ -50,20 +49,23 @@ $dbh=mysql_connect ($config['db']['server'], $config['db']['user'], $config['db'
 mysql_select_db ($config['db']['db']);
 
 $yay = 0; $user = ''; $pass = ''; $sess = '';
+$theme='';
 
-if ($_REQUEST['login']) $user = $_REQUEST['login'];
-elseif ($_COOKIE['user']) $user = $_COOKIE['user'];
+if ( isset($_REQUEST['login']) ) $user = $_REQUEST['login'];
+elseif ( isset($_COOKIE['user']) ) $user = $_COOKIE['user'];
 
-if ($_REQUEST['encpas']) $pass = $_REQUEST['encpas'];
-elseif ($_COOKIE['pass']) $pass = $_COOKIE['pass'];
+if ( isset($_REQUEST['encpas']) ) $pass = $_REQUEST['encpas'];
+elseif ( isset($_COOKIE['pass']) ) $pass = $_COOKIE['pass'];
 
-if ($_REQUEST['randsess']) $sess = $_REQUEST['randsess'];
-elseif ($_COOKIE['sess']) $sess= $_COOKIE['sess'];
+if ( isset($_REQUEST['randsess']) ) $sess = $_REQUEST['randsess'];
+elseif ( isset($_COOKIE['sess']) ) $sess= $_COOKIE['sess'];
 
 if ($user && $pass) {
 
 	$mysql = mysql_query("SELECT pass, user, id, folder, http, spacelimit, language, theme, permbrowse, permupload, permcreate, permuser, permadmin, permdelete, permmove, permchmod, permget, permdeleteuser, permedituser, permmakeuser, permpass, permrename, permedit, permsub, formatperm, status, recycle, permprefs FROM ".$GLOBALS['config']['db']['pref']."users WHERE user='".mysql_escape_string($user)."'");
 	list ($dbpass, $dbuser, $userid, $userdir, $http, $limit, $language, $theme, $permbrowse, $permupload, $permcreate, $permuser, $permadmin, $permdelete, $permmove, $permchmod, $permget, $permdeleteuser, $permedituser, $permmakeuser, $permpass, $permrename, $permedit, $permsub, $formatperm, $status, $recycle, $permprefs) = mysql_fetch_row($mysql);
+
+        
 
 	if ($userid && $pass == md5($dbpass.$sess)) {
 		$yay = 1;
@@ -71,7 +73,6 @@ if ($user && $pass) {
 }
 
 if ($yay) {
-
 	$user = $dbuser;
 	$activesess = date("YmdHis");
 	$mysql = mysql_query("UPDATE ".$GLOBALS['config']['db']['pref']."users SET currsess='$activesess' WHERE id='$userid'") or die (mysql_error());
@@ -96,14 +97,16 @@ if ($yay) {
 	setcookie('pass',$pass,time()+60*60*24*1);
 	setcookie('sess',$sess,time()+60*60*24*1);
 
-} else {
-	if ($_REQUEST['login'] || $_REQUEST['encpas']) $er = true;
-	require_once("themes/$defaulttheme/theme.php");
+} else {    
+	$er=false;
+        if ( isset($_REQUEST['login']) || isset($_REQUEST['encpas']) ) $er = true;
+	$theme=$defaulttheme;
+        require_once("themes/$theme/theme.php");
 	login($er);
 }
 
 
-$d = $_REQUEST['d'];
+if( isset($_REQUEST['d']) ) $d=$_REQUEST['d']; else $d=null;
 if ($d) {
   while (preg_match('/\\\/',$d)) $d = preg_replace('/\\\/','/',$d);
   while (preg_match('/\/\//',$d)) $d = preg_replace('/\/\//','/',$d);
@@ -172,6 +175,7 @@ function alternatehome() {
 
 function home() {
   global $nobar, $d, $bgcolor3, $tbcolor1, $tbcolor2, $tbcolor3, $tbcolor4, $userdir, $HTTP_HOST, $theme, $http, $extraheaders, $IMG_CHECK, $IMG_RENAME, $IMG_GET, $IMG_EDIT, $IMG_OPEN, $IMG_RENAME_NULL, $IMG_EDIT_NULL, $IMG_OPEN_NULL, $IMG_GET_NULL, $IMG_MIME_FOLDER, $IMG_MIME_BINARY, $IMG_MIME_AUDIO, $IMG_MIME_VIDEO, $IMG_MIME_IMAGE, $IMG_MIME_TEXT, $IMG_MIME_UNKNOWN, $permget, $permedit, $permrename, $permsub, $formatperm, $permmove, $permdelete, $permchmod;
+  global $adminfile;
   $extraheaders = "<script language=javascript>\n"
                  ."function itemsel(item,ff,check,action,overcolor,outcolor,clickcolor) {\n"
                  ."  if (action == 1) {\n"
@@ -209,6 +213,7 @@ function home() {
 
   $count = "0";
   $a=1; $b=1; $content1 = ""; $content2 = "";
+  $p=0; $tcoloring=''; $totalsize=0;
 
   $handle=opendir($userdir.$d);
   while ($fileinfo = readdir($handle)) $filelist[] = $fileinfo;
@@ -355,7 +360,7 @@ function listdir($dir, $level_count = 0) {
 function logout() {
   setcookie("user","",time()-60*60*24*1);
   setcookie("pass","",time()-60*60*24*1);
-  $login=yes;
+  $login=null;
   page_header("Logout",false);
   echo "Your are now logged out."
       ."<br><br>"
@@ -564,7 +569,7 @@ function save($ncontent, $fename, $d, $next_action) {
 
 
 function cr() {
-  global $d, $userdir;
+  global $d, $userdir,$content,$adminfile;
   page_header("Create");
   opentitle("Create");
   opentable("100%");
@@ -1528,7 +1533,7 @@ function pass() {
                  ."      document.prefmod.encpas2.value = hashb;\n"
                  ."      return true;\n"
                  ."    } else {\n"
-                 ."      form.onsubmit=null;\n"
+                 ."      form.onsubmit=function(){return false;};\n"
                  ."      return false;\n"
                  ."    }\n"
                  ."  } \n"
@@ -1850,8 +1855,8 @@ function md5return() {
 
 
 
-
-switch($_REQUEST['p']) {
+if ( isset($_REQUEST['p']) ) $p=$_REQUEST['p']; else $p=null;
+switch($p) {
   case "logout":
     logout();
 	break;

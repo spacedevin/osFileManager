@@ -1,5 +1,5 @@
 <?php
-//$theme = "classic";
+
 $tbcolor1 = "#E5E5E5";
 $tbcolor2 = "#EEEEEE";
 $tbcolor3 = "#FFCC99";
@@ -32,8 +32,10 @@ $IMG_MIME_UNKNOWN = "themes/$theme/images/mime/page_white.png";
 function page_header($title,$show = true) {
   global $HEADER_CHARACTERSET, $permmakeuser, $permedituser, $permdeleteuser, $permbrowse, $permupload, $permcreate, $permuser, $permadmin, $d, $darkgrey, $lkcolor1, $lkcolor2, $lkcolor3, $lkcolor4, $background, $lightgrey, $incolor2, $incolor1, $black, $white, $user, $pass, $extraheaders, $sitetitle, $bgcolor1, $bgcolor2, $bgcolor3, $txtcolor1, $txtcolor2, $tbcolor4, $IMG_ACTION, $IMG_CHMOD, $IMG_DELETE, $IMG_MOVE;
   global $extraheaders, $sitetitle, $lastsess, $login, $viewing, $iftop, $bgcolor1, $bgcolor2, $bgcolor3, $txtcolor1, $txtcolor2, $user, $pass, $password, $debug, $issuper;
+  global $adminfile;
+
   echo "<html>\n<head>\n"
-      ."<title>$sitetitle :: $title »   Powerd by Arz FileManager 2.0 (Libra)</title>\n"
+      ."<title>$sitetitle :: $title ï¿½   Powerd by Arz FileManager 2.0 (Libra)</title>\n"
       ."<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$HEADER_CHARACTERSET\">\n"
       ."</head>\n"
       ."<body bgcolor=\"#ffffff\">\n"
