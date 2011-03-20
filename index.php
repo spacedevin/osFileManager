@@ -138,7 +138,7 @@ function login($fail = false) {
                    ."      document.login.submit();\n"
                    ."      return true;\n"
                    ."    } else {\n"
-                   ."      form.onsubmit=null;\n"
+                   ."      document.login.onsubmit=function(){return false;}\n"
                    ."      return false;\n"
                    ."    }\n"
                    ."  }\n"
@@ -1847,9 +1847,12 @@ function md5return() {
       return str;
     }
 
-    function valid_js() {
+    function valid_js() {      
       if (navigator.userAgent.indexOf(\"Mozilla/\") == 0) {
         return (parseInt(navigator.appVersion) >= 4);
+      
+      }else if( navigator.userAgent.indexOf(\"Opera/\") == 0) {
+        return (parseInt(navigator.appVersion) >= 9);
       }
       return false;
     }
