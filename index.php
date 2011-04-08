@@ -217,16 +217,16 @@ function home() {
   $a=1; $b=1; $content1 = ""; $content2 = "";
   $p=0; $tcoloring=''; $totalsize=0;
 
-  $handle=opendir($userdir.$d);
+  $handle=opendir($http.$userdir.$d);
   while ($fileinfo = readdir($handle)) $filelist[] = $fileinfo;
   natcasesort($filelist);
   while (list ($key, $fileinfo) = each ($filelist)) {
     if (strlen($fileinfo)>40) $fileinfoa = substr($fileinfo,0,40)."...";
     else $fileinfoa = $fileinfo;
     if ($fileinfo[0] != "." && $fileinfo[0] != ".." ) {
-      if (is_dir($userdir.$d.$fileinfo) && is_readable($userdir.$d.$fileinfo)) { 
-        if ($formatperm == 1) $perms = formatperms(@fileperms($userdir.$d.$fileinfo));
-        else $perms = substr(sprintf('%o', @fileperms($userdir.$d.$fileinfo)), -4);
+      if (is_dir($http.$userdir.$d.$fileinfo) && is_readable($http.$userdir.$d.$fileinfo)) {
+        if ($formatperm == 1) $perms = formatperms(@fileperms($http.$userdir.$d.$fileinfo));
+        else $perms = substr(sprintf('%o', @fileperms($http.$userdir.$d.$fileinfo)), -4);
 
         if ($permrename == 1) $lnk_rename = "<a href=\"".$adminfile."?p=ren&file=".$fileinfo."&d=$d\"><img src=\"$IMG_RENAME\" border=0 onclick=\"itemsel(this,1,'foldersel_$a',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
         else $lnk_rename = "<img src=\"$IMG_RENAME_NULL\" border=0>\n";
@@ -240,12 +240,12 @@ function home() {
                  ."<td align=\"center\">".$lnk_rename."\n"
                  ."<td> <td align=\"center\"> <td align=\"center\">$perms\n";
         $a++;
-      } elseif (!is_dir($userdir.$d.$fileinfo) && is_readable($userdir.$d.$fileinfo)) { 
-        if ($formatperm == 1) $perms = formatperms(@fileperms($userdir.$d.$fileinfo));
-        else $perms = substr(sprintf('%o', @fileperms($userdir.$d.$fileinfo)), -4);
-        $size = filesize($userdir.$d.$fileinfo);
+      } elseif (!is_dir($http.$userdir.$d.$fileinfo) && is_readable($http.$userdir.$d.$fileinfo)) {
+        if ($formatperm == 1) $perms = formatperms(@fileperms($http.$userdir.$d.$fileinfo));
+        else $perms = substr(sprintf('%o', @fileperms($http.$userdir.$d.$fileinfo)), -4);
+        $size = filesize($http.$userdir.$d.$fileinfo);
         $totalsize = $totalsize + $size;
-        $type = mime_content_type($userdir.$d.$fileinfo);
+        $type = mime_content_type($http.$userdir.$d.$fileinfo);        
         if (substr($type,0,4) == "text") $mimeimage = "<img src=\"$IMG_MIME_TEXT\">";
         elseif (substr($type,0,5) == "image") $mimeimage = "<img src=\"$IMG_MIME_IMAGE\">";
         elseif (substr($type,0,11) == "application") $mimeimage = "<img src=\"$IMG_MIME_BINARY\">";
@@ -256,9 +256,9 @@ function home() {
         elseif (substr($type,0,9) == "multipart") $mimeimage = "<img src=\"$IMG_MIME_TEXT\">";
         else $mimeimage = "<img src=\"$IMG_MIME_UNKNOWN\">";
 
-        if ((substr($type,0,4) == "text" || $size == 0) && $permedit == 1) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d\"><img src=\"$IMG_EDIT\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
-        elseif (substr($type,0,4) == "text" || $size == 0) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d\"><img src=\"$IMG_EDIT_NULL\" border=0>\n"; 
-        else $edit = "";
+        if ((substr($type,0,4) == "text" || $size == 0) && $permedit == 1) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d&next_action=0\"><img src=\"$IMG_EDIT\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
+        elseif (substr($type,0,4) == "text" || $size == 0) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d&next_action=0\"><img src=\"$IMG_EDIT_NULL\" border=0>\n";
+        else $edit = "";        
         if ($permrename == 1) $rename = "<a href=\"".$adminfile."?p=ren&file=".$fileinfo."&d=$d\"><img src=\"$IMG_RENAME\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
         else $rename = "<img src=\"$IMG_RENAME_NULL\" border=0>\n";
         if ($permget == 1) $get = "<a href=\"".$adminfile."?p=view&file=".$fileinfo."&d=$d\"><img src=\"$IMG_GET\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
@@ -283,6 +283,7 @@ function home() {
   @closedir($userdir.$d);
   $filetotal = $b;
   $foldertotal = $a;
+  $pdir='';
   echo "<tr bgcolor=\"$tbcolor3\" width=20 class=titlebar1 height=25><td width=10 align=left valign=bottom><a href=\"javascript:selectall();\"><img src=\"$IMG_CHECK\" border=0></a> "
       ."<td class=theader width=420>Filename\n"
       ."<td align=\"center\" width=80 class=theader colspan=3>Actions<font size=1>\n"
