@@ -508,9 +508,10 @@ function upload($upfile, $ndir, $d) {
 }
 
 
-function edit($fename) {
-  global $userdir, $d, $next_action, $message;
-  if ($fename && file_exists($userdir.$d.$fename)) {
+function edit($fename,$next_action) {
+  global $userdir, $d, $message,$adminfile,$http;  
+  $sel1=''; $sel2='';
+  if ($fename && file_exists($http.$userdir.$d.$fename)) {      
     if ($next_action == 2) $sel2 = " checked";
     else $sel1 = " checked";
     page_header("Edit");
@@ -520,15 +521,9 @@ function edit($fename) {
     else echo "Editing: '".$d.$fename."'<br>\n";
     echo "<form action=\"".$adminfile."?p=save\" method=\"post\">\n"
         ."<textarea cols=\"73\" rows=\"40\" name=\"ncontent\" wrap=off>\n";
-    $handle = fopen ($userdir.$d.$fename, "r");
-    $contents = "";
-    while ($x<1) {
-      $data = @fread ($handle, filesize ($userdir.$d.$fename));
-      if (strlen($data) == 0) break;
-      $contents .= $data;
-    }
-    fclose ($handle);
-    echo  ereg_replace ("</textarea>","&lt;/textarea&gt;",$contents)
+    $handle = fopen ($http.$userdir.$d.$fename, "r");    
+    $contents = file_get_contents($http.$userdir.$d.$fename);        
+    echo  str_replace ("</textarea>","&lt;/textarea&gt;",$contents)
         ."</textarea>\n"
         ."<br>\n"
         ."<input type=\"hidden\" name=\"d\" value=\"".$d."\">\n"
@@ -553,9 +548,9 @@ function edit($fename) {
 
 
 function save($ncontent, $fename, $d, $next_action) {
-  global $userdir, $message;
+  global $userdir, $message,$http;
   if ($fename) {
-    $fp = fopen($userdir.$d.$fename, "w");
+    $fp = fopen($http.$userdir.$d.$fename, "w");
     if ($ncontent) {
       if(fwrite($fp, stripslashes($ncontent))) {
         $fp = null;
@@ -1886,7 +1881,7 @@ switch($p) {
     else permerror("You do not currently have permission to upload.\n");
     break;
   case "edit":
-    if ($permedit == 1) edit($_REQUEST['fename']);
+    if ($permedit == 1) edit($_REQUEST['fename'],$_REQUEST['next_action']);
     else permerror("You do not currently have permission to edit.\n");
     break;
   case "save":
