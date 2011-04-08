@@ -386,9 +386,18 @@ function getfilesize($size) {
 
 
 if (!function_exists('mime_content_type')) {
-   function mime_content_type($f) {
-       $f = escapeshellarg($f);
-       return trim( `file -bi $f` );
+   function mime_content_type($filename) {
+        $i=strrpos($filename,"."); $m=strtolower(substr($filename,$i+1));
+        switch($m){
+            case "js": return "application/javascript";
+            case "json": return "application/json";
+            case "jpg": case "jpeg": case "jpe": return "image/jpg";
+            case "png": case "gif": case "bmp": return "image/".$m;
+            case "css": return "text/css";
+            case "xml": return "application/xml";
+            case "html": case "htm": case "php": return "text/html";
+            default: return "";
+        }
    }
 }
 
