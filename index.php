@@ -263,7 +263,7 @@ function home() {
         else $rename = "<img src=\"$IMG_RENAME_NULL\" border=0>\n";
         if ($permget == 1) $get = "<a href=\"".$adminfile."?p=view&file=".$fileinfo."&d=$d\"><img src=\"$IMG_GET\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
         else $get = "<img src=\"$IMG_GET_NULL\" border=0>\n";
-        if ($permget == 1) $filefile = "<a href=\"".$http.$d.$fileinfo."\" onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\">".$fileinfoa."</a>\n";
+        if ($permget == 1) $filefile = "<a href=\"".$http.$userdir.$d.$fileinfo."\" onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\">".$fileinfoa."</a>\n";
         else $filefile = "$fileinfoa\n";
 
         $content2[$b] ="<td><input type=checkbox name=\"filesel[$b]\" id=\"filesel_$b\" value=\"".$fileinfo."\" onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\">\n"
