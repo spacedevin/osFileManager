@@ -636,7 +636,7 @@ function create($nfname, $isfolder, $d, $ndir) {
 
 
 function ren($file) {
-  global $d;
+  global $d,$adminfile;
   if (!$file == "") {
     page_header("Rename");
     opentitle("Rename");
@@ -678,14 +678,18 @@ function renam($rename, $nrename, $d) {
 
 
 function bulk_submit($bulk_action,$d) {
-  global $_POST, $sqlpref, $d, $tbcolor1, $userdir, $tbcolor2;
+  global $_POST, $sqlpref, $d, $tbcolor1, $userdir, $tbcolor2, $item;
   if (!$bulk_action) $error .= "Please select an action.<br>\n";
-  if (!$_POST[filesel] && !$_POST[foldersel]) $error .= "Please select at least one file to perform an action on.<br>\n";
-  if ($_POST[filesel] && $_POST[foldersel]) $delvar = "files/folders and all of their content";
-  elseif ($_POST[filesel] && count($_POST[filesel]) > 1) $delvar = "files";
-  elseif ($_POST[foldersel] && count($_POST[foldersel]) > 1) $delvar = "folders and all of their content";
-  elseif ($_POST[filesel]) $delvar = "file";
-  elseif ($_POST[foldersel]) $delvar = "folder and all of its contents";
+  $filesel=null; $foldersel=null; $error='';
+  if( isset($_POST["filesel"]) )$filesel=$_POST["filesel"];  
+  if( isset($_POST["foldersel"]) )$foldersel=$_POST["foldersel"];
+
+  if (!$filesel && !$foldersel) $error .= "Please select at least one file to perform an action on.<br>\n";
+  if ($filesel && $foldersel) $delvar = "files/folders and all of their content";
+  elseif ($filesel && count($filesel) > 1) $delvar = "files";
+  elseif ($foldersel && count($foldersel) > 1) $delvar = "folders and all of their content";
+  elseif ($filesel) $delvar = "file";
+  elseif ($foldersel) $delvar = "folder and all of its contents";
   if (!$error && $bulk_action == "delete") {
     page_header("Delete");
     opentitle("Delete");
@@ -695,14 +699,14 @@ function bulk_submit($bulk_action,$d) {
         ."<tr><td><font class=error>Are you sure you want to delete the following $delvar?</font><br>\n"
         ."<tr><td bgcolor=$tbcolor1>\n";
     $a=0; $b=0;
-    if (is_array($_POST[filesel])) {
-      foreach ($_POST[filesel] as $file) {
+    if (is_array($filesel)) {
+      foreach ($filesel as $file) {
         echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
         $a++;
       }
     }
-    if (is_array($_POST[foldersel])) {
-      foreach ($_POST[foldersel] as $file) {
+    if (is_array($foldersel)) {
+      foreach ($foldersel as $file) {
         echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
         $b++;
       }
@@ -724,14 +728,14 @@ function bulk_submit($bulk_action,$d) {
         ."<tr><td bgcolor=$tbcolor1>\n";
 
     $a=0; $b=0;
-    if (is_array($_POST[filesel])) {
-      foreach ($_POST[filesel] as $file) {
+    if (is_array($filesel)) {
+      foreach ($filesel as $file) {
         echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
         $a++;
       }
     }
-    if (is_array($_POST[foldersel])) {
-      foreach ($_POST[foldersel] as $file) {
+    if (is_array($foldersel)) {
+      foreach ($foldersel as $file) {
         echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
         $b++;
       }
@@ -758,25 +762,25 @@ function bulk_submit($bulk_action,$d) {
         ."<tr><td bgcolor=$tbcolor1>\n";
 
     $a=0; $b=0;
-    if (is_array($_POST[filesel])) {
-      foreach ($_POST[filesel] as $file) {
+    if (is_array($filesel)) {
+      foreach ($filesel as $file) {
         echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
         $a++;
       }
     }
-    if (is_array($_POST[foldersel])) {
-      foreach ($_POST[foldersel] as $file) {
+    if (is_array($foldersel)) {
+      foreach ($foldersel as $file) {
         echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
         $b++;
       }
     }
     
-    if (is_array($_POST[filesel])) {
-      $keys = array_keys($_POST[filesel]);
-      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$_POST[filesel][$keys{0}])), -4);
+    if (is_array($filesel)) {
+      $keys = array_keys($filesel);
+      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$filesel[$keys{0}])), -4);
     } else {
-      $keys = array_keys($_POST[foldersel]);
-      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$_POST[foldersel][$keys{0}])), -4);
+      $keys = array_keys($foldersel);
+      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$foldersel[$keys{0}])), -4);
     }
     echo "<tr><td><br><table cellpadding=0 cellspacing=0>\n"
 /* Work in Progess
@@ -1968,7 +1972,7 @@ switch($p) {
     if ($permmove != 1 && $_REQUEST['bulk_action'] == "move") permerror("You do not currently have permission to move files/folders.\n");
     elseif ($permdelete != 1 && $_REQUEST['bulk_action'] == "delete") permerror("You do not currently have permission to delete files/folders.\n");
     elseif ($permchmod != 1 && $_REQUEST['bulk_action'] == "chmod") permerror("You do not currently have permission to change file/folders permissions.\n");
-    else bulk_action($_REQUEST['bulk_action'], $d,$_REQUEST['ndir']);
+    else bulk_action($_REQUEST['bulk_action'], $d,@$_REQUEST['ndir']);
     break;
   case "users":
     if ($permedituser == "1" || $permedituser == "1") usermod();
