@@ -703,13 +703,13 @@ function bulk_submit($bulk_action,$d) {
     $a=0; $b=0;
     if (is_array($filesel)) {
       foreach ($filesel as $file) {
-        echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
+        echo "$file <input type=hidden name=\"filesel[$a]\" value=\"$file\"><br>\n";
         $a++;
       }
     }
     if (is_array($foldersel)) {
       foreach ($foldersel as $file) {
-        echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
+        echo "$file<input type=hidden name=\"foldersel[$b]\" value=\"$file\"><br>\n";
         $b++;
       }
     }
@@ -732,13 +732,13 @@ function bulk_submit($bulk_action,$d) {
     $a=0; $b=0;
     if (is_array($filesel)) {
       foreach ($filesel as $file) {
-        echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
+        echo "$file <input type=hidden name=\"filesel[$a]\" value=\"$file\"><br>\n";
         $a++;
       }
     }
     if (is_array($foldersel)) {
       foreach ($foldersel as $file) {
-        echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
+        echo "$file<input type=hidden name=\"foldersel[$b]\" value=\"$file\"><br>\n";
         $b++;
       }
     }
@@ -766,13 +766,13 @@ function bulk_submit($bulk_action,$d) {
     $a=0; $b=0;
     if (is_array($filesel)) {
       foreach ($filesel as $file) {
-        echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
+        echo "$file <input type=hidden name=\"filesel[$a]\" value=\"$file\"><br>\n";
         $a++;
       }
     }
     if (is_array($foldersel)) {
       foreach ($foldersel as $file) {
-        echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
+        echo "$file<input type=hidden name=\"foldersel[$b]\" value=\"$file\"><br>\n";
         $b++;
       }
     }
