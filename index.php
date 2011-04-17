@@ -607,13 +607,15 @@ function cr() {
 function create($nfname, $isfolder, $d, $ndir) {
   global $userdir, $default_perm;
   if (!$d) $dis = "/";
+  $error='';
   page_header("Create");
   opentitle("Create");
   opentable("100%");
   if (!$nfname == "") {
     if (!file_exists($userdir.$d.$nfname)) {
       if ($isfolder == 1) {
-        if(mkdir($userdir.$d.$nfname, $default_perm)) $ok = "Your directory, '".$dis.$d.$ndir.$nfname."', was succesfully created.\n";
+        $perm=substr(sprintf('%o', @fileperms($userdir.$d)), -4);
+        if(mkdir($userdir.$d.$nfname, $perm))$ok = "Your directory, '".$dis.$d.$ndir.$nfname."', was succesfully created.\n";
         else $error = "The directory, '/".$d.$ndir.$nfname."', could not be created. Check to make sure the permisions on the directory is set to '0777'.\n";
       } else {
         if(fopen($userdir.$d.$nfname, "w")) {
@@ -624,7 +626,7 @@ function create($nfname, $isfolder, $d, $ndir) {
       if ($ok) echo "<font class=ok>$ok</font><br><a href=\"?d=$d\">Return</a>\n";
       if ($error) echo "<font class=error>$error</font><br><a href=\"javascript:history.back();\">Back</a>\n";
     } else {
-      if (is_dir($userdir.d.$nfname)) echo "<font class=error>A directory by this name already exists. Please choose another.</font><br><a href=\"javascript:history.back();\">Back</a>\n";
+      if (is_dir($userdir.$d.$nfname)) echo "<font class=error>A directory by this name already exists. Please choose another.</font><br><a href=\"javascript:history.back();\">Back</a>\n";
       else echo "<font class=error>A file/directory by this name already exists. Please choose another.</font><br><a href=\"javascript:history.back();\">Back</a>\n";
     }
   } else {
