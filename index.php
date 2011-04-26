@@ -1603,9 +1603,14 @@ function password($oldpass, $newpass, $cnewpass) {
 
 
 function prefs() {
-  global $user, $d, $error, $sqlpref, $extraheaders, $config_email, $config_name, $config_theme, $config_language, $config_recycle, $config_formatperm;
+  global $user, $d, $error, $sqlpref, $extraheaders, $config_recycle;
   $result = mysql_query("SELECT id, user, email, name, theme, language, recycle, formatperm, permrecycle FROM ".$GLOBALS['config']['db']['pref']."users WHERE user='".$user."'");
   list($uid, $uname, $email, $name, $theme, $language, $recycle, $formatperm, $permrecycle) = mysql_fetch_row($result);
+  if (isset($_REQUEST["config_name"])) $config_name=$_REQUEST["config_name"]; else $config_name='';
+  if (isset($_REQUEST["config_email"])) $config_email=$_REQUEST["config_email"]; else $config_email='';
+  if (isset($_REQUEST["config_theme"])) $config_theme=$_REQUEST["config_theme"]; else $config_theme='';
+  if (isset($_REQUEST["config_language"])) $config_language=$_REQUEST["config_language"]; else $config_language='';
+  if (isset($_REQUEST["config_formatperm"])) $config_formatperm=$_REQUEST["config_formatperm"]; else $config_formatperm='';
   if ($error){
     $email = $config_email;
     $name = $config_name;
@@ -1619,6 +1624,7 @@ function prefs() {
   opentable("100%");
   echo "<table>\n"
       ."<form name=\"prefs\" action=\"?p=saveprefs\" method=\"post\">\n";
+  $perm1 = ''; $perm2 = '';
   if ($formatperm == '0') $perm1 = " checked";
   elseif ($formatperm == '1') $perm2 = " checked"; 
   if ($recycle == 0) $rec1 = " checked";
@@ -1662,7 +1668,7 @@ function prefs() {
   }
   echo "<tr><td>Permission View: <td>\n"
       ."<input type=\"radio\" name=\"config_formatperm\" id=\"perm1\" value=\"0\" $perm1><label for=\"perm1\"> UNIX (0644)</label>&nbsp;&nbsp;&nbsp;\n"
-      ."<input type=\"radio\" name=\"config_formatperm\" id=\"perm2\" value=\"1\" checked><label for=\"perm2\"> Symbolic (-rw-r--r--)</label>\n"
+      ."<input type=\"radio\" name=\"config_formatperm\" id=\"perm2\" value=\"1\" $perm2><label for=\"perm2\"> Symbolic (-rw-r--r--)</label>\n"
       ."<input type=hidden name=d value=\"$d\">\n"
       ."<tr><td colspan=\"2\"><br><input type=\"submit\" name=\"submitButtonName\" value=\"Save\" border=\"0\" class=\"button\">\n"
       ."</td></tr></form></table>\n";
@@ -1927,7 +1933,7 @@ switch($p) {
     else permerror("You do not currently have permission to change your preferences.\n");
     break;
   case "saveprefs":
-    if ($permpass == 1) preferences($_REQUEST['config_email'], $_REQUEST['config_name'], $_REQUEST['config_theme'], $_REQUEST['config_language'], $_REQUEST['config_recycle'], $_REQUEST['config_formatperm']);
+    if ($permpass == 1) preferences(@$_REQUEST['config_email'], @$_REQUEST['config_name'], @$_REQUEST['config_theme'], @$_REQUEST['config_language'], @$_REQUEST['config_recycle'], @$_REQUEST['config_formatperm']);
     else permerror("You do not currently have permission to change your preferences.\n");
     break;
   case "super":
