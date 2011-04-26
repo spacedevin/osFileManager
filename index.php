@@ -445,9 +445,9 @@ function permerror($error) {
 } 
 
 
-function ismail($str) {
-  if(eregi("^[\'+\\./0-9A-Z^_\`a-z{|}~\-]+@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+){1,5}$",$str) || !$str) return true;
-  else return false;
+function ismail($str) {  
+  if (preg_match('/^([a-z0-9])(([-a-z0-9._])*([a-z0-9]))*\@([a-z0-9])(([a-z0-9-])*([a-z0-9]))+' . '(\.([a-z0-9])([-a-z0-9_-])?([a-z0-9])+)+$/i', $str)) return true;
+    else return false;
 }
 
 
