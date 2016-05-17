@@ -1,9 +1,9 @@
 osFileManager 2.2
 ---
 
-**This is an old version for people runing older versions of PHP**.
+**This is no longer supported**.
 
-**For the latest code see https://github.com/arzynik/cheryl or visit http://cheryl.io**
+**For a more modern file browser see https://github.com/arzynik/cheryl or visit http://cheryl.io**
 
 ---
 
