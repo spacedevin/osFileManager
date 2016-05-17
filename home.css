@@ -1,0 +1,169 @@
+body {
+	margin: 0px;
+	color: #4f4f4f;
+	background-color: #FFFFFF;
+	font: 14px Open Sans, Helvetica, Arial, sans-serif;
+	text-align: center;
+}
+#nav {
+	background: url(/images/top-bg.jpg);
+	height: 47px;
+	text-align: center;
+}
+
+#home {
+	text-align: center;
+	padding-top: 20px;
+}
+
+#footer {
+	text-align: center;
+	padding: 40px 0px 20px 0px;
+	font: 12px verdana, arial, sans-serif;
+	color: #777777;
+}
+
+#content {
+	padding-top: 20px;
+	margin: 0 auto;
+	clear: both;
+	max-width: 800px;
+	text-align: left;
+	line-height: 150%;
+}
+
+.content {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.link {
+	border: 0px;
+	padding: 0px 8px 0px 8px;
+}
+
+h1 {
+	font: 18px verdana, arial, sans-serif;
+	margin: 0px 0px 6px 0px;
+}
+
+h2 {
+	font: bold 14px verdana, arial, sans-serif;
+	margin: 0px 0px 6px 0px;
+}
+
+p {
+	text-align: justify;
+	margin: 0px;
+}
+
+p, ul {
+	line-height: 1.9em;
+}
+
+img {
+	border: 0px;
+}
+
+.highslide-wrapper div {
+    font-family: Verdana, Helvetica;
+    font-size: 10pt;
+}
+.highslide {
+	cursor: url(/images/zoomin.cur), pointer;
+    outline: none;
+    text-decoration: none;
+	border: 0px;
+}
+.highslide-active-anchor img {
+	visibility: hidden;
+}
+.highslide img {
+	border: 0px;
+}
+
+.highslide-wrapper, .drop-shadow {
+	background: white;
+}
+
+.highslide-caption {
+    display: none;
+    border-bottom: 0px solid white;
+    font-family: Verdana, Helvetica;
+    font-size: 10pt;
+    padding: 5px;
+    background-color: #FFFFFF;
+}
+
+.highslide-loading {
+    display: block;
+	color: black;
+	font-size: 8pt;
+	font-family: sans-serif;
+	font-weight: bold;
+    text-decoration: none;
+	padding: 2px;
+	border: 1px solid black;
+    background-color: white;
+
+    padding-left: 22px;
+    background-image: url(/images/loader.white.gif);
+    background-repeat: no-repeat;
+    background-position: 3px 1px;
+}
+
+a.highslide-full-expand {
+	background: url(/images/fullexpand.gif) no-repeat;
+	display: block;
+	margin: 0 10px 10px 0;
+	width: 34px;
+	height: 34px;
+}
+.highslide-overlay {
+	display: none;
+}
+
+.closebutton {
+	position: relative;
+	top: -15px;
+	left: 15px;
+	width: 30px;
+	height: 30px;
+	cursor: hand; /* ie */
+	cursor: pointer; /* w3c */
+	background: url(/images/close.png);
+	_background: none;
+	_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/images/close.png', sizingMethod='scale');
+}
+
+.important {
+	border: 1px solid #acbded;
+	background-color: #f1f4fc;
+	padding: 25px 0px 25px 0px;
+}
+
+pre {
+	border: 1px solid #acbded;
+	background-color: #f1f4fc;
+	padding: 5px 15px 5px 15px;
+}
+
+.bigtable {
+	width: 100%;
+}
+
+.home-top-image {
+	width: 100%;
+}
+
+#home button {
+	border-radius: 5px;
+	border: 1px solid #a30000;
+	background: none;
+	height: 40px;
+	width: 140px;
+	font-size: 14px;
+	margin: 9px;
+	cursor: pointer;
+	color: #a30000;
+}

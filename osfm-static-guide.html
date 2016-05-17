@@ -1,0 +1,70 @@
+---
+layout: default
+---
+
+<div id="home">
+	<a href="/index.html"><img src="/images/top.jpg" alt="osFileManager" /></a>
+</div>
+
+<div id="content">
+<table cellpadding="10"  class="bigtable">
+	<tr><td valign="top">
+
+		<h1>Install Guides</h1><br />
+		<a href="/osfilemanager-docs.html">Full Install Guide</a><br />
+		<a href="/osfm-static-guide.html">Static Install Guide</a><br /><br />
+
+		<h1>Community</h1><br />
+		<a href="https://github.com/arzynik/osFileManager/issues" target="_blank">Bug tracker / Get help</a>
+
+		<hr style="height: 1px; width: 100%; background-color: #e6e6e6; border: 0px; margin: 50px 0 50px 0;" />
+
+		<a name="static"></a><h1><?php echo $releases['static']['category']. ' '.$releases['static']['version']; ?> Install Guide</h1>
+		<ol>
+		<li><a href="#staticDownload">Download</a></li>
+		<li><a href="#staticConfig">Edit configuration</a></li>
+		<li><a href="#staticUpload">Upload the files</a></li>
+		<li><a href="#staticLogin">Login</a></li>
+		</ol>
+
+		<br />
+		<a name="staticDownload"></a><h2>Download</h2>
+		<p>osFileManager requires PHP. We <b>strongly</b> reccomend you install suPHP or suexec as it will protect the security of your files. If your webhost does not support PHP or suPHP, consider <a href="/hosting.html">signing up for one that does</a>.</p>
+		<ul>
+		<li><a href="http://www.php.net/" target="_blank">Download PHP</a></li>
+		<li><a href="http://www.suphp.org/Home.html" target="_blank">Download suPHP</a></li>
+		<li><a href="/download.html" target="_blank">Download osFileManager</a></li>
+		</ul>
+		<br />
+
+		<a name="staticConfig"></a><h2>Edit configuration</h2>
+		<p>All of the configuration info is stored in the main osFileManager file. Follow the steps below to configure it.</p>
+		<ol>
+		<li>Open "osfm-static.php" in your favorite text editor</li>
+		<li>Find the "Config Section"</li>
+		<li>Set "user" to whatever username you want</li>
+		<li>Set "pass" to whatever password you want</li>
+		<li>Save the file</li>
+		</ol>
+		<br />
+
+		<a name="staticUpload"></a><h2>Upload the files</h2>
+		<ol>
+		<li>Log into your FTP or SSH account if you are a remote server</li>
+		<li>Go to your web root directory. This is sometimes public_html</li>
+		<li>Upload "osfm-static.php"</li>
+		<li>If you are not using suPHP: chmod any directory that you want to write or upload to to <b>0777</b> <br /><i>This is insecure but the only way to do it without suPHP</i></li>
+		</ol>
+		<br />
+
+		<a name="staticLogin"></a><h2>Login</h2>
+		<ol>
+		<li>Navigate to your osfm directory on your server in your browser.<br /><i>Ex: http://my.server.com/osfm-static.php</i></li>
+		<li>Login with the username and password you set</li>
+		</ol>
+		<br />
+
+	</td></tr>
+
+</table><br /><br />
+</div>

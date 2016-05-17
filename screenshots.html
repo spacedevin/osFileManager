@@ -1,0 +1,44 @@
+---
+layout: default
+---
+
+<div id="home">
+	<a href="/index.html"><img src="/images/top.jpg" alt="osFileManager" /></a>
+</div>
+
+<div id="content">
+<table cellpadding="10" cellspacing="0" class="bigtable">
+	<tr><td valign="top">
+			<h1><?php echo $releases['full']['category']. ' '.$releases['full']['version']; ?></h1>
+	</td></tr><tr><td style="width: 50%; text-align: center;" valign="top">
+		<b>Browse Files</b><br /><a href="/images/shot-index.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-index.jpg" alt="Browse" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Browse through the content of a preset folder. Click a directory to enter it, click a file to view it. Or download the file (source file).</div>
+	</td><td style="width: 50%; text-align: center;" valign="top">
+		<b>Bulk Modify</b><br /><a href="/images/shot-bulk.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-bulk.jpg" alt="Bulk" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Select and modify multiple files at once.</div>
+
+	</td></tr><tr><td style="width: 50%; text-align: center;" valign="top">
+		<b>Upload Files</b><br /><a href="/images/shot-upload.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-upload.jpg" alt="Upload" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Upload multiple files at once.</div>
+	</td><td style="width: 50%; text-align: center;" valign="top">
+		<b>Rename Files</b><br /><a href="/images/shot-rename.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-rename.jpg" alt="Rename" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Rename files or folders.</div>
+
+	</td></tr><tr><td style="width: 50%; text-align: center;" valign="top">
+		<b>Manage Users</b><br /><a href="/images/shot-users.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-users.jpg" alt="Users" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Create, edit, and delete users.</div>
+	</td><td style="width: 50%; text-align: center;" valign="top">
+		<b>Preferences</b><br /><a href="/images/shot-prefs.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-prefs.jpg" alt="Preferences" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Edit preferences such as file permission format, and user theme.</div>
+
+	</td></tr><tr><td style="width: 50%; text-align: center;" valign="top">
+		<b>Edit Files</b><br /><a href="/images/shot-edit.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-edit.jpg" alt="Edit" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Edit text files or PHP files directly.</div>
+	</td><td style="width: 50%; text-align: center;" valign="top">
+		<b>Permissions</b><br /><a href="/images/shot-admin.jpg" class="highslide" onclick="return openShot(this);"><img src="/images/thumb-admin.jpg" alt="Admin" title="Click to enlarge" width="250" class="noclose" /></a>
+		<div class="highslide-caption">Customize user preferences and specific permissions.</div>
+	</td></tr>
+</table>
+</div>
+
+<div id="closebutton" class="highslide-overlay closebutton" onclick="return hs.close(this)" title="Close"></div>
