@@ -1,5 +1,5 @@
 <?php
-//$theme = "classic";
+
 $tbcolor1 = "#E5E5E5";
 $tbcolor2 = "#EEEEEE";
 $tbcolor3 = "#FFCC99";
@@ -32,17 +32,19 @@ $IMG_MIME_UNKNOWN = "themes/$theme/images/mime/page_white.png";
 function page_header($title,$show = true) {
   global $HEADER_CHARACTERSET, $permmakeuser, $permedituser, $permdeleteuser, $permbrowse, $permupload, $permcreate, $permuser, $permadmin, $d, $darkgrey, $lkcolor1, $lkcolor2, $lkcolor3, $lkcolor4, $background, $lightgrey, $incolor2, $incolor1, $black, $white, $user, $pass, $extraheaders, $sitetitle, $bgcolor1, $bgcolor2, $bgcolor3, $txtcolor1, $txtcolor2, $tbcolor4, $IMG_ACTION, $IMG_CHMOD, $IMG_DELETE, $IMG_MOVE;
   global $extraheaders, $sitetitle, $lastsess, $login, $viewing, $iftop, $bgcolor1, $bgcolor2, $bgcolor3, $txtcolor1, $txtcolor2, $user, $pass, $password, $debug, $issuper;
+  global $adminfile;
+
   echo "<html>\n<head>\n"
-      ."<title>$sitetitle :: $title »   Powerd by Arz FileManager 2.0 (Libra)</title>\n"
+      ."<title>$sitetitle :: $title ï¿½   Powerd by Arz FileManager 2.0 (Libra)</title>\n"
       ."<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$HEADER_CHARACTERSET\">\n"
       ."</head>\n"
       ."<body bgcolor=\"#ffffff\">\n"
       ."<style>\n"
       ."td { font-size : 80%;font-family : tahoma;color: $txtcolor1;}\n"
-      ."A:visited {color: \"$txtcolor2\";text-decoration: underline;}\n"
-      ."A:hover {color: \"$txtcolor1\";text-decoration: underline;}\n"
-      ."A:link {color: \"$txtcolor2\";text-decoration: underline;}\n"
-      ."A:active {color: \"$bgcolor2\";text-decoration: underline;}\n"
+      ."A:visited {color: $txtcolor2;text-decoration: underline;}\n"
+      ."A:hover {color: $txtcolor1;text-decoration: underline;}\n"
+      ."A:link {color: $txtcolor2;text-decoration: underline;}\n"
+      ."A:active {color: $bgcolor2;text-decoration: underline;}\n"
       ."BODY {color: $txtcolor1; FONT-SIZE: 10pt; FONT-FAMILY: Verdana, Tahoma, Arial, Helvetica, sans-serif; MARGIN: 0px 0px 10px; BACKGROUND-COLOR: $bgcolor1;\n"
       ."                      SCROLLBAR-BASE-COLOR: #5B628C; \n"
       ."                      MARGIN: 0px; SCROLLBAR-HIGHLIGHT-COLOR: #e0e5ff; \n"
@@ -51,14 +53,14 @@ function page_header($title,$show = true) {
       ."                      SCROLLBAR-DARKSHADOW-COLOR: #e0e5ff;}\n"
       ."SELECT,TEXTAREA      {FONT-SIZE: 8pt; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; \n"
       ."                      BORDER-RIGHT: 1px solid; BORDER-TOP: 1px solid; BORDER-LEFT: 1px solid; \n"
-      ."                      BORDER-BOTTOM: 1px solid; BACKGROUND: #EFF1F3; COLOR: #000000; spacing: 0; \n"
+      ."                      BORDER-BOTTOM: 1px solid; BACKGROUND: #EFF1F3; COLOR: #000000; letter-spacing: 0; \n"
       ."                      BORDER-RIGHT-COLOR: #000000; BORDER-TOP-COLOR: #000000; BORDER-LEFT-COLOR: #000000; \n"
       ."                      BORDER-BOTTOM-COLOR: #000000; SCROLLBAR-BASE-COLOR: #5B628C; \n"
       ."                      MARGIN: 0px; SCROLLBAR-HIGHLIGHT-COLOR: #e0e5ff; \n"
       ."                      SCROLLBAR-SHADOW-COLOR: #e0e5ff; SCROLLBAR-3DLIGHT-COLOR: #5B628C; \n"
       ."                      SCROLLBAR-ARROW-COLOR: #e0e5ff; SCROLLBAR-TRACK-COLOR: #e0e5ff; \n"
       ."                      SCROLLBAR-DARKSHADOW-COLOR: #e0e5ff;}\n"
-      ."INPUT                {border: 1px solid #000000; spacing: 0; MARGIN: 0px 0px 0px 0px; margin-right: 0px; margin-left: 0px; margin-top: 0px; margin-bottom: 0px;}\n"
+      ."INPUT                {border: 1px solid #000000; letter-spacing: 0; MARGIN: 0px 0px 0px 0px; margin-right: 0px; margin-left: 0px; margin-top: 0px; margin-bottom: 0px;}\n"
 
       ."TEXTAREA             {FONT-FAMILY: Lucida Console, Courier New, Courier;}\n"
       .".title {FONT-WEIGHT: bold; FONT-SIZE: 10pt; COLOR: #000000; TEXT-ALIGN: center; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif}\n"
@@ -74,12 +76,12 @@ function page_header($title,$show = true) {
       .".barerror {BACKGROUND-COLOR: #d70000;}\n"
       .".txtinput {background: rgb(255, 255, 255) url('themes/classic/images/txtbar.jpg'); FONT-SIZE: 8pt; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; \n"
       ."                      BORDER-RIGHT: 1px solid; BORDER-TOP: 1px solid; BORDER-LEFT: 1px solid; \n"
-      ."                      BORDER-BOTTOM: 1px solid; COLOR: #000000; spacing: 0; \n"
+      ."                      BORDER-BOTTOM: 1px solid; COLOR: #000000; letter-spacing: 0; \n"
       ."                      BORDER-RIGHT-COLOR: #000000; BORDER-TOP-COLOR: #000000; BORDER-LEFT-COLOR: #000000; \n"
       ."                      BORDER-BOTTOM-COLOR: #000000; MARGIN: 0px; }\n"
       .".button {BACKGROUND: #EFF1F3; FONT-SIZE: 8pt; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; \n"
       ."                      BORDER-RIGHT: 1px solid; BORDER-TOP: 1px solid; BORDER-LEFT: 1px solid; \n"
-      ."                      BORDER-BOTTOM: 1px solid; COLOR: #000000; spacing: 0; \n"
+      ."                      BORDER-BOTTOM: 1px solid; COLOR: #000000; letter-spacing: 0; \n"
       ."                      BORDER-RIGHT-COLOR: #000000; BORDER-TOP-COLOR: #000000; BORDER-LEFT-COLOR: #000000; \n"
       ."                      BORDER-BOTTOM-COLOR: #000000; MARGIN: 0px; }\n"
       .".titlebar1         { COLOR: #FFFFFF; background: url(\"themes/classic/images/titlebar1.jpg\") repeat-x top left; }\n"
@@ -110,9 +112,10 @@ function page_header($title,$show = true) {
 
 
 function page_footer() {
-  global $nobar, $user;
+  global $nobar, $user, $logged;  
   /* keep this footer or you are just a big meaning :( */
-  if ($nobar != 1) echo "<tr class=titlebar2 align=right><td class=titlebar2 align=right height=15>\n"; if ($user) showdiskspace();
+  if ($nobar != 1) echo "<tr class=titlebar2 align=right><td class=titlebar2 align=right height=15>\n";
+  if ($logged==true) showdiskspace();
   echo "</table></table><tr><td align=right><font class=copyright>Powerd by <a href=http://www.osfilemanager.com/>osFileManager</a><br>&copy; 2003-".date("Y")." <a href=http://www.arzy.net/>Arzy LLC</a></font></table>\n"
       ."</body>\n"
       ."</html>\n";
