@@ -1,5 +1,4 @@
 <?php
-
 /****************************************************************/
 /*                                                              */
 /* File Admin                                                   */
@@ -32,7 +31,7 @@
 /* $defaultlang - default language.                             */
 /****************************************************************/
 
-$adminfile = $SCRIPT_NAME;
+$adminfile = $_SERVER['PHP_SELF'];
 $sitetitle = "Demo Browser";
 $config['db']['server'] 		= 'localhost';
 $config['db']['user'] 			= 'arzbeta_libra';
@@ -50,20 +49,23 @@ $dbh=mysql_connect ($config['db']['server'], $config['db']['user'], $config['db'
 mysql_select_db ($config['db']['db']);
 
 $yay = 0; $user = ''; $pass = ''; $sess = '';
+$theme=''; $logged=false;
 
-if ($_REQUEST['login']) $user = $_REQUEST['login'];
-elseif ($_COOKIE['user']) $user = $_COOKIE['user'];
+if ( isset($_REQUEST['login']) ) $user = $_REQUEST['login'];
+elseif ( isset($_COOKIE['user']) ) $user = $_COOKIE['user'];
 
-if ($_REQUEST['encpas']) $pass = $_REQUEST['encpas'];
-elseif ($_COOKIE['pass']) $pass = $_COOKIE['pass'];
+if ( isset($_REQUEST['encpas']) ) $pass = $_REQUEST['encpas'];
+elseif ( isset($_COOKIE['pass']) ) $pass = $_COOKIE['pass'];
 
-if ($_REQUEST['randsess']) $sess = $_REQUEST['randsess'];
-elseif ($_COOKIE['sess']) $sess= $_COOKIE['sess'];
+if ( isset($_REQUEST['randsess']) ) $sess = $_REQUEST['randsess'];
+elseif ( isset($_COOKIE['sess']) ) $sess= $_COOKIE['sess'];
 
 if ($user && $pass) {
 
 	$mysql = mysql_query("SELECT pass, user, id, folder, http, spacelimit, language, theme, permbrowse, permupload, permcreate, permuser, permadmin, permdelete, permmove, permchmod, permget, permdeleteuser, permedituser, permmakeuser, permpass, permrename, permedit, permsub, formatperm, status, recycle, permprefs FROM ".$GLOBALS['config']['db']['pref']."users WHERE user='".mysql_escape_string($user)."'");
 	list ($dbpass, $dbuser, $userid, $userdir, $http, $limit, $language, $theme, $permbrowse, $permupload, $permcreate, $permuser, $permadmin, $permdelete, $permmove, $permchmod, $permget, $permdeleteuser, $permedituser, $permmakeuser, $permpass, $permrename, $permedit, $permsub, $formatperm, $status, $recycle, $permprefs) = mysql_fetch_row($mysql);
+
+        
 
 	if ($userid && $pass == md5($dbpass.$sess)) {
 		$yay = 1;
@@ -71,7 +73,6 @@ if ($user && $pass) {
 }
 
 if ($yay) {
-
 	$user = $dbuser;
 	$activesess = date("YmdHis");
 	$mysql = mysql_query("UPDATE ".$GLOBALS['config']['db']['pref']."users SET currsess='$activesess' WHERE id='$userid'") or die (mysql_error());
@@ -96,14 +97,19 @@ if ($yay) {
 	setcookie('pass',$pass,time()+60*60*24*1);
 	setcookie('sess',$sess,time()+60*60*24*1);
 
-} else {
-	if ($_REQUEST['login'] || $_REQUEST['encpas']) $er = true;
-	require_once("themes/$defaulttheme/theme.php");
+        $logged=true;
+
+} else {    
+	$er=false;
+        if ( isset($_REQUEST['login']) || isset($_REQUEST['encpas']) ) $er = true;
+	$theme=$defaulttheme;
+        require_once("themes/$theme/theme.php");
+        $logged=false;
 	login($er);
 }
 
 
-$d = $_REQUEST['d'];
+if( isset($_REQUEST['d']) ) $d=$_REQUEST['d']; else $d=null;
 if ($d) {
   while (preg_match('/\\\/',$d)) $d = preg_replace('/\\\/','/',$d);
   while (preg_match('/\/\//',$d)) $d = preg_replace('/\/\//','/',$d);
@@ -120,7 +126,6 @@ function login($fail = false) {
 	setcookie('sess','',time()-60*60*24*1);
 	$user = '';
 	$pass = '';
-
   global $configindex, $extraheaders, $REQUEST_URI, $sqlpref, $lastpage, $bgcolor1, $bgcolor2,$bgcolor3, $tbcolor1, $tbcolor2, $fail, $login, $password, $user, $pass;
     $randsess = md5(md5(rand(1,25419876)).md5(date("DMjygia")));
     $extraheaders = "<script language=javascript>\n"
@@ -133,7 +138,7 @@ function login($fail = false) {
                    ."      document.login.submit();\n"
                    ."      return true;\n"
                    ."    } else {\n"
-                   ."      form.onsubmit=null;\n"
+                   ."      document.login.onsubmit=function(){return false;}\n"
                    ."      return false;\n"
                    ."    }\n"
                    ."  }\n"
@@ -172,6 +177,7 @@ function alternatehome() {
 
 function home() {
   global $nobar, $d, $bgcolor3, $tbcolor1, $tbcolor2, $tbcolor3, $tbcolor4, $userdir, $HTTP_HOST, $theme, $http, $extraheaders, $IMG_CHECK, $IMG_RENAME, $IMG_GET, $IMG_EDIT, $IMG_OPEN, $IMG_RENAME_NULL, $IMG_EDIT_NULL, $IMG_OPEN_NULL, $IMG_GET_NULL, $IMG_MIME_FOLDER, $IMG_MIME_BINARY, $IMG_MIME_AUDIO, $IMG_MIME_VIDEO, $IMG_MIME_IMAGE, $IMG_MIME_TEXT, $IMG_MIME_UNKNOWN, $permget, $permedit, $permrename, $permsub, $formatperm, $permmove, $permdelete, $permchmod;
+  global $adminfile;
   $extraheaders = "<script language=javascript>\n"
                  ."function itemsel(item,ff,check,action,overcolor,outcolor,clickcolor) {\n"
                  ."  if (action == 1) {\n"
@@ -209,17 +215,18 @@ function home() {
 
   $count = "0";
   $a=1; $b=1; $content1 = ""; $content2 = "";
+  $p=0; $tcoloring=''; $totalsize=0;
 
-  $handle=opendir($userdir.$d);
+  $handle=opendir($http.$userdir.$d);
   while ($fileinfo = readdir($handle)) $filelist[] = $fileinfo;
   natcasesort($filelist);
   while (list ($key, $fileinfo) = each ($filelist)) {
     if (strlen($fileinfo)>40) $fileinfoa = substr($fileinfo,0,40)."...";
     else $fileinfoa = $fileinfo;
     if ($fileinfo[0] != "." && $fileinfo[0] != ".." ) {
-      if (is_dir($userdir.$d.$fileinfo) && is_readable($userdir.$d.$fileinfo)) { 
-        if ($formatperm == 1) $perms = formatperms(@fileperms($userdir.$d.$fileinfo));
-        else $perms = substr(sprintf('%o', @fileperms($userdir.$d.$fileinfo)), -4);
+      if (is_dir($http.$userdir.$d.$fileinfo) && is_readable($http.$userdir.$d.$fileinfo)) {
+        if ($formatperm == 1) $perms = formatperms(@fileperms($http.$userdir.$d.$fileinfo));
+        else $perms = substr(sprintf('%o', @fileperms($http.$userdir.$d.$fileinfo)), -4);
 
         if ($permrename == 1) $lnk_rename = "<a href=\"".$adminfile."?p=ren&file=".$fileinfo."&d=$d\"><img src=\"$IMG_RENAME\" border=0 onclick=\"itemsel(this,1,'foldersel_$a',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
         else $lnk_rename = "<img src=\"$IMG_RENAME_NULL\" border=0>\n";
@@ -233,12 +240,12 @@ function home() {
                  ."<td align=\"center\">".$lnk_rename."\n"
                  ."<td> <td align=\"center\"> <td align=\"center\">$perms\n";
         $a++;
-      } elseif (!is_dir($userdir.$d.$fileinfo) && is_readable($userdir.$d.$fileinfo)) { 
-        if ($formatperm == 1) $perms = formatperms(@fileperms($userdir.$d.$fileinfo));
-        else $perms = substr(sprintf('%o', @fileperms($userdir.$d.$fileinfo)), -4);
-        $size = filesize($userdir.$d.$fileinfo);
+      } elseif (!is_dir($http.$userdir.$d.$fileinfo) && is_readable($http.$userdir.$d.$fileinfo)) {
+        if ($formatperm == 1) $perms = formatperms(@fileperms($http.$userdir.$d.$fileinfo));
+        else $perms = substr(sprintf('%o', @fileperms($http.$userdir.$d.$fileinfo)), -4);
+        $size = filesize($http.$userdir.$d.$fileinfo);
         $totalsize = $totalsize + $size;
-        $type = mime_content_type($userdir.$d.$fileinfo);
+        $type = mime_content_type($http.$userdir.$d.$fileinfo);        
         if (substr($type,0,4) == "text") $mimeimage = "<img src=\"$IMG_MIME_TEXT\">";
         elseif (substr($type,0,5) == "image") $mimeimage = "<img src=\"$IMG_MIME_IMAGE\">";
         elseif (substr($type,0,11) == "application") $mimeimage = "<img src=\"$IMG_MIME_BINARY\">";
@@ -249,14 +256,14 @@ function home() {
         elseif (substr($type,0,9) == "multipart") $mimeimage = "<img src=\"$IMG_MIME_TEXT\">";
         else $mimeimage = "<img src=\"$IMG_MIME_UNKNOWN\">";
 
-        if ((substr($type,0,4) == "text" || $size == 0) && $permedit == 1) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d\"><img src=\"$IMG_EDIT\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
-        elseif (substr($type,0,4) == "text" || $size == 0) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d\"><img src=\"$IMG_EDIT_NULL\" border=0>\n"; 
-        else $edit = "";
+        if ((substr($type,0,4) == "text" || $size == 0) && $permedit == 1) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d&next_action=0\"><img src=\"$IMG_EDIT\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
+        elseif (substr($type,0,4) == "text" || $size == 0) $edit = "<a href=\"".$adminfile."?p=edit&fename=".$fileinfo."&d=$d&next_action=0\"><img src=\"$IMG_EDIT_NULL\" border=0>\n";
+        else $edit = "";        
         if ($permrename == 1) $rename = "<a href=\"".$adminfile."?p=ren&file=".$fileinfo."&d=$d\"><img src=\"$IMG_RENAME\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
         else $rename = "<img src=\"$IMG_RENAME_NULL\" border=0>\n";
         if ($permget == 1) $get = "<a href=\"".$adminfile."?p=view&file=".$fileinfo."&d=$d\"><img src=\"$IMG_GET\" border=0 onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\"></a>\n";
         else $get = "<img src=\"$IMG_GET_NULL\" border=0>\n";
-        if ($permget == 1) $filefile = "<a href=\"".$http.$d.$fileinfo."\" onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\">".$fileinfoa."</a>\n";
+        if ($permget == 1) $filefile = "<a href=\"".$http.$userdir.$d.$fileinfo."\" onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\">".$fileinfoa."</a>\n";
         else $filefile = "$fileinfoa\n";
 
         $content2[$b] ="<td><input type=checkbox name=\"filesel[$b]\" id=\"filesel_$b\" value=\"".$fileinfo."\" onclick=\"itemsel(this,1,'filesel_$b',3,'#CCCCFF','$tcoloring','#FFCC99');\">\n"
@@ -276,6 +283,7 @@ function home() {
   @closedir($userdir.$d);
   $filetotal = $b;
   $foldertotal = $a;
+  $pdir='';
   echo "<tr bgcolor=\"$tbcolor3\" width=20 class=titlebar1 height=25><td width=10 align=left valign=bottom><a href=\"javascript:selectall();\"><img src=\"$IMG_CHECK\" border=0></a> "
       ."<td class=theader width=420>Filename\n"
       ."<td align=\"center\" width=80 class=theader colspan=3>Actions<font size=1>\n"
@@ -353,13 +361,15 @@ function listdir($dir, $level_count = 0) {
 
 
 function logout() {
+  global $logged;
   setcookie("user","",time()-60*60*24*1);
   setcookie("pass","",time()-60*60*24*1);
-  $login=yes;
+  $login=null;
   page_header("Logout",false);
   echo "Your are now logged out."
       ."<br><br>"
       ."<a href=?p=login>Click here to Log in again</a>";
+  $logged=false;
   page_footer();
 }
 
@@ -377,9 +387,18 @@ function getfilesize($size) {
 
 
 if (!function_exists('mime_content_type')) {
-   function mime_content_type($f) {
-       $f = escapeshellarg($f);
-       return trim( `file -bi $f` );
+   function mime_content_type($filename) {
+        $i=strrpos($filename,"."); $m=strtolower(substr($filename,$i+1));
+        switch($m){
+            case "js": return "application/javascript";
+            case "json": return "application/json";
+            case "jpg": case "jpeg": case "jpe": return "image/jpg";
+            case "png": case "gif": case "bmp": return "image/".$m;
+            case "css": return "text/css";
+            case "xml": return "application/xml";
+            case "html": case "htm": case "php": return "text/html";
+            default: return "";
+        }
    }
 }
 
@@ -426,9 +445,9 @@ function permerror($error) {
 } 
 
 
-function ismail($str) {
-  if(eregi("^[\'+\\./0-9A-Z^_\`a-z{|}~\-]+@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+){1,5}$",$str) || !$str) return true;
-  else return false;
+function ismail($str) {  
+  if (preg_match('/^([a-z0-9])(([-a-z0-9._])*([a-z0-9]))*\@([a-z0-9])(([a-z0-9-])*([a-z0-9]))+' . '(\.([a-z0-9])([-a-z0-9_-])?([a-z0-9])+)+$/i', $str)) return true;
+    else return false;
 }
 
 
@@ -489,9 +508,10 @@ function upload($upfile, $ndir, $d) {
 }
 
 
-function edit($fename) {
-  global $userdir, $d, $next_action, $message;
-  if ($fename && file_exists($userdir.$d.$fename)) {
+function edit($fename,$next_action) {
+  global $userdir, $d, $message,$adminfile,$http;  
+  $sel1=''; $sel2='';
+  if ($fename && file_exists($http.$userdir.$d.$fename)) {      
     if ($next_action == 2) $sel2 = " checked";
     else $sel1 = " checked";
     page_header("Edit");
@@ -501,15 +521,9 @@ function edit($fename) {
     else echo "Editing: '".$d.$fename."'<br>\n";
     echo "<form action=\"".$adminfile."?p=save\" method=\"post\">\n"
         ."<textarea cols=\"73\" rows=\"40\" name=\"ncontent\" wrap=off>\n";
-    $handle = fopen ($userdir.$d.$fename, "r");
-    $contents = "";
-    while ($x<1) {
-      $data = @fread ($handle, filesize ($userdir.$d.$fename));
-      if (strlen($data) == 0) break;
-      $contents .= $data;
-    }
-    fclose ($handle);
-    echo  ereg_replace ("</textarea>","&lt;/textarea&gt;",$contents)
+    $handle = fopen ($http.$userdir.$d.$fename, "r");    
+    $contents = file_get_contents($http.$userdir.$d.$fename);        
+    echo  str_replace ("</textarea>","&lt;/textarea&gt;",$contents)
         ."</textarea>\n"
         ."<br>\n"
         ."<input type=\"hidden\" name=\"d\" value=\"".$d."\">\n"
@@ -534,9 +548,9 @@ function edit($fename) {
 
 
 function save($ncontent, $fename, $d, $next_action) {
-  global $userdir, $message;
+  global $userdir, $message,$http;
   if ($fename) {
-    $fp = fopen($userdir.$d.$fename, "w");
+    $fp = fopen($http.$userdir.$d.$fename, "w");
     if ($ncontent) {
       if(fwrite($fp, stripslashes($ncontent))) {
         $fp = null;
@@ -564,7 +578,7 @@ function save($ncontent, $fename, $d, $next_action) {
 
 
 function cr() {
-  global $d, $userdir;
+  global $d, $userdir,$content,$adminfile;
   page_header("Create");
   opentitle("Create");
   opentable("100%");
@@ -593,13 +607,15 @@ function cr() {
 function create($nfname, $isfolder, $d, $ndir) {
   global $userdir, $default_perm;
   if (!$d) $dis = "/";
+  $error='';
   page_header("Create");
   opentitle("Create");
   opentable("100%");
   if (!$nfname == "") {
     if (!file_exists($userdir.$d.$nfname)) {
       if ($isfolder == 1) {
-        if(mkdir($userdir.$d.$nfname, $default_perm)) $ok = "Your directory, '".$dis.$d.$ndir.$nfname."', was succesfully created.\n";
+        $perm=substr(sprintf('%o', @fileperms($userdir.$d)), -4);
+        if(mkdir($userdir.$d.$nfname, $perm))$ok = "Your directory, '".$dis.$d.$ndir.$nfname."', was succesfully created.\n";
         else $error = "The directory, '/".$d.$ndir.$nfname."', could not be created. Check to make sure the permisions on the directory is set to '0777'.\n";
       } else {
         if(fopen($userdir.$d.$nfname, "w")) {
@@ -610,7 +626,7 @@ function create($nfname, $isfolder, $d, $ndir) {
       if ($ok) echo "<font class=ok>$ok</font><br><a href=\"?d=$d\">Return</a>\n";
       if ($error) echo "<font class=error>$error</font><br><a href=\"javascript:history.back();\">Back</a>\n";
     } else {
-      if (is_dir($userdir.d.$nfname)) echo "<font class=error>A directory by this name already exists. Please choose another.</font><br><a href=\"javascript:history.back();\">Back</a>\n";
+      if (is_dir($userdir.$d.$nfname)) echo "<font class=error>A directory by this name already exists. Please choose another.</font><br><a href=\"javascript:history.back();\">Back</a>\n";
       else echo "<font class=error>A file/directory by this name already exists. Please choose another.</font><br><a href=\"javascript:history.back();\">Back</a>\n";
     }
   } else {
@@ -622,7 +638,7 @@ function create($nfname, $isfolder, $d, $ndir) {
 
 
 function ren($file) {
-  global $d;
+  global $d,$adminfile;
   if (!$file == "") {
     page_header("Rename");
     opentitle("Rename");
@@ -664,14 +680,18 @@ function renam($rename, $nrename, $d) {
 
 
 function bulk_submit($bulk_action,$d) {
-  global $_POST, $sqlpref, $d, $tbcolor1, $userdir, $tbcolor2;
+  global $_POST, $sqlpref, $d, $tbcolor1, $userdir, $tbcolor2, $item;
   if (!$bulk_action) $error .= "Please select an action.<br>\n";
-  if (!$_POST[filesel] && !$_POST[foldersel]) $error .= "Please select at least one file to perform an action on.<br>\n";
-  if ($_POST[filesel] && $_POST[foldersel]) $delvar = "files/folders and all of their content";
-  elseif ($_POST[filesel] && count($_POST[filesel]) > 1) $delvar = "files";
-  elseif ($_POST[foldersel] && count($_POST[foldersel]) > 1) $delvar = "folders and all of their content";
-  elseif ($_POST[filesel]) $delvar = "file";
-  elseif ($_POST[foldersel]) $delvar = "folder and all of its contents";
+  $filesel=null; $foldersel=null; $error='';
+  if( isset($_POST["filesel"]) )$filesel=$_POST["filesel"];  
+  if( isset($_POST["foldersel"]) )$foldersel=$_POST["foldersel"];
+
+  if (!$filesel && !$foldersel) $error .= "Please select at least one file to perform an action on.<br>\n";
+  if ($filesel && $foldersel) $delvar = "files/folders and all of their content";
+  elseif ($filesel && count($filesel) > 1) $delvar = "files";
+  elseif ($foldersel && count($foldersel) > 1) $delvar = "folders and all of their content";
+  elseif ($filesel) $delvar = "file";
+  elseif ($foldersel) $delvar = "folder and all of its contents";
   if (!$error && $bulk_action == "delete") {
     page_header("Delete");
     opentitle("Delete");
@@ -681,15 +701,15 @@ function bulk_submit($bulk_action,$d) {
         ."<tr><td><font class=error>Are you sure you want to delete the following $delvar?</font><br>\n"
         ."<tr><td bgcolor=$tbcolor1>\n";
     $a=0; $b=0;
-    if (is_array($_POST[filesel])) {
-      foreach ($_POST[filesel] as $file) {
-        echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
+    if (is_array($filesel)) {
+      foreach ($filesel as $file) {
+        echo "$file <input type=hidden name=\"filesel[$a]\" value=\"$file\"><br>\n";
         $a++;
       }
     }
-    if (is_array($_POST[foldersel])) {
-      foreach ($_POST[foldersel] as $file) {
-        echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
+    if (is_array($foldersel)) {
+      foreach ($foldersel as $file) {
+        echo "$file<input type=hidden name=\"foldersel[$b]\" value=\"$file\"><br>\n";
         $b++;
       }
     }
@@ -710,15 +730,15 @@ function bulk_submit($bulk_action,$d) {
         ."<tr><td bgcolor=$tbcolor1>\n";
 
     $a=0; $b=0;
-    if (is_array($_POST[filesel])) {
-      foreach ($_POST[filesel] as $file) {
-        echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
+    if (is_array($filesel)) {
+      foreach ($filesel as $file) {
+        echo "$file <input type=hidden name=\"filesel[$a]\" value=\"$file\"><br>\n";
         $a++;
       }
     }
-    if (is_array($_POST[foldersel])) {
-      foreach ($_POST[foldersel] as $file) {
-        echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
+    if (is_array($foldersel)) {
+      foreach ($foldersel as $file) {
+        echo "$file<input type=hidden name=\"foldersel[$b]\" value=\"$file\"><br>\n";
         $b++;
       }
     }
@@ -744,25 +764,25 @@ function bulk_submit($bulk_action,$d) {
         ."<tr><td bgcolor=$tbcolor1>\n";
 
     $a=0; $b=0;
-    if (is_array($_POST[filesel])) {
-      foreach ($_POST[filesel] as $file) {
-        echo "$file <input type=hidden name=filesel[$a] value=$file><br>\n";
+    if (is_array($filesel)) {
+      foreach ($filesel as $file) {
+        echo "$file <input type=hidden name=\"filesel[$a]\" value=\"$file\"><br>\n";
         $a++;
       }
     }
-    if (is_array($_POST[foldersel])) {
-      foreach ($_POST[foldersel] as $file) {
-        echo "$file<input type=hidden name=foldersel[$b] value=$file><br>\n";
+    if (is_array($foldersel)) {
+      foreach ($foldersel as $file) {
+        echo "$file<input type=hidden name=\"foldersel[$b]\" value=\"$file\"><br>\n";
         $b++;
       }
     }
     
-    if (is_array($_POST[filesel])) {
-      $keys = array_keys($_POST[filesel]);
-      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$_POST[filesel][$keys{0}])), -4);
+    if (is_array($filesel)) {
+      $keys = array_keys($filesel);
+      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$filesel[$keys{0}])), -4);
     } else {
-      $keys = array_keys($_POST[foldersel]);
-      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$_POST[foldersel][$keys{0}])), -4);
+      $keys = array_keys($foldersel);
+      $chval = substr(sprintf('%o', @fileperms($userdir.$d.$foldersel[$keys{0}])), -4);
     }
     echo "<tr><td><br><table cellpadding=0 cellspacing=0>\n"
 /* Work in Progess
@@ -1528,7 +1548,7 @@ function pass() {
                  ."      document.prefmod.encpas2.value = hashb;\n"
                  ."      return true;\n"
                  ."    } else {\n"
-                 ."      form.onsubmit=null;\n"
+                 ."      form.onsubmit=function(){return false;};\n"
                  ."      return false;\n"
                  ."    }\n"
                  ."  } \n"
@@ -1583,9 +1603,14 @@ function password($oldpass, $newpass, $cnewpass) {
 
 
 function prefs() {
-  global $user, $d, $error, $sqlpref, $extraheaders, $config_email, $config_name, $config_theme, $config_language, $config_recycle, $config_formatperm;
+  global $user, $d, $error, $sqlpref, $extraheaders, $config_recycle;
   $result = mysql_query("SELECT id, user, email, name, theme, language, recycle, formatperm, permrecycle FROM ".$GLOBALS['config']['db']['pref']."users WHERE user='".$user."'");
   list($uid, $uname, $email, $name, $theme, $language, $recycle, $formatperm, $permrecycle) = mysql_fetch_row($result);
+  if (isset($_REQUEST["config_name"])) $config_name=$_REQUEST["config_name"]; else $config_name='';
+  if (isset($_REQUEST["config_email"])) $config_email=$_REQUEST["config_email"]; else $config_email='';
+  if (isset($_REQUEST["config_theme"])) $config_theme=$_REQUEST["config_theme"]; else $config_theme='';
+  if (isset($_REQUEST["config_language"])) $config_language=$_REQUEST["config_language"]; else $config_language='';
+  if (isset($_REQUEST["config_formatperm"])) $config_formatperm=$_REQUEST["config_formatperm"]; else $config_formatperm='';
   if ($error){
     $email = $config_email;
     $name = $config_name;
@@ -1599,6 +1624,7 @@ function prefs() {
   opentable("100%");
   echo "<table>\n"
       ."<form name=\"prefs\" action=\"?p=saveprefs\" method=\"post\">\n";
+  $perm1 = ''; $perm2 = '';
   if ($formatperm == '0') $perm1 = " checked";
   elseif ($formatperm == '1') $perm2 = " checked"; 
   if ($recycle == 0) $rec1 = " checked";
@@ -1642,7 +1668,7 @@ function prefs() {
   }
   echo "<tr><td>Permission View: <td>\n"
       ."<input type=\"radio\" name=\"config_formatperm\" id=\"perm1\" value=\"0\" $perm1><label for=\"perm1\"> UNIX (0644)</label>&nbsp;&nbsp;&nbsp;\n"
-      ."<input type=\"radio\" name=\"config_formatperm\" id=\"perm2\" value=\"1\" checked><label for=\"perm2\"> Symbolic (-rw-r--r--)</label>\n"
+      ."<input type=\"radio\" name=\"config_formatperm\" id=\"perm2\" value=\"1\" $perm2><label for=\"perm2\"> Symbolic (-rw-r--r--)</label>\n"
       ."<input type=hidden name=d value=\"$d\">\n"
       ."<tr><td colspan=\"2\"><br><input type=\"submit\" name=\"submitButtonName\" value=\"Save\" border=\"0\" class=\"button\">\n"
       ."</td></tr></form></table>\n";
@@ -1838,9 +1864,12 @@ function md5return() {
       return str;
     }
 
-    function valid_js() {
+    function valid_js() {      
       if (navigator.userAgent.indexOf(\"Mozilla/\") == 0) {
         return (parseInt(navigator.appVersion) >= 4);
+      
+      }else if( navigator.userAgent.indexOf(\"Opera/\") == 0) {
+        return (parseInt(navigator.appVersion) >= 9);
       }
       return false;
     }
@@ -1850,8 +1879,8 @@ function md5return() {
 
 
 
-
-switch($_REQUEST['p']) {
+if ( isset($_REQUEST['p']) ) $p=$_REQUEST['p']; else $p=null;
+switch($p) {
   case "logout":
     logout();
 	break;
@@ -1864,7 +1893,7 @@ switch($_REQUEST['p']) {
     else permerror("You do not currently have permission to upload.\n");
     break;
   case "edit":
-    if ($permedit == 1) edit($_REQUEST['fename']);
+    if ($permedit == 1) edit($_REQUEST['fename'],$_REQUEST['next_action']);
     else permerror("You do not currently have permission to edit.\n");
     break;
   case "save":
@@ -1904,7 +1933,7 @@ switch($_REQUEST['p']) {
     else permerror("You do not currently have permission to change your preferences.\n");
     break;
   case "saveprefs":
-    if ($permpass == 1) preferences($_REQUEST['config_email'], $_REQUEST['config_name'], $_REQUEST['config_theme'], $_REQUEST['config_language'], $_REQUEST['config_recycle'], $_REQUEST['config_formatperm']);
+    if ($permpass == 1) preferences(@$_REQUEST['config_email'], @$_REQUEST['config_name'], @$_REQUEST['config_theme'], @$_REQUEST['config_language'], @$_REQUEST['config_recycle'], @$_REQUEST['config_formatperm']);
     else permerror("You do not currently have permission to change your preferences.\n");
     break;
   case "super":
@@ -1951,7 +1980,7 @@ switch($_REQUEST['p']) {
     if ($permmove != 1 && $_REQUEST['bulk_action'] == "move") permerror("You do not currently have permission to move files/folders.\n");
     elseif ($permdelete != 1 && $_REQUEST['bulk_action'] == "delete") permerror("You do not currently have permission to delete files/folders.\n");
     elseif ($permchmod != 1 && $_REQUEST['bulk_action'] == "chmod") permerror("You do not currently have permission to change file/folders permissions.\n");
-    else bulk_action($_REQUEST['bulk_action'], $d,$_REQUEST['ndir']);
+    else bulk_action($_REQUEST['bulk_action'], $d,@$_REQUEST['ndir']);
     break;
   case "users":
     if ($permedituser == "1" || $permedituser == "1") usermod();
